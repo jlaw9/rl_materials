@@ -1,14 +1,22 @@
-# rlmolecule
+# rl_materials
 
 ## About
 
-A library for general-purpose material and molecular optimization using AlphaZero-style reinforcement learning.
+A library for general-purpose material optimization using AlphaZero-style reinforcement learning.
 
-Code currently under development as part of
-the ["End-to-End Optimization for Battery Materials and Molecules by Combining Graph Neural Networks and Reinforcement Learning"](https://arpa-e.energy.gov/technologies/projects/end-end-optimization-battery-materials-and-molecules-combining-graph-neural)
-project at the National Renewable Energy Laboratory (NREL), Colorado School of Mines (CSU), and Colorado State
-University (CSU). Funding provided by the Advanced Research Projects Agency–Energy (ARPA-E)'
-s [DIFFERENTIATE program](https://arpa-e.energy.gov/technologies/programs/differentiate)
+This repo is a snapshot of the code used for the paper "Upper-Bound Energy Minimization to Search for Stable
+Functional Materials with Graph Neural Networks" in 2022.  Much of this code is specific to the HPC system 
+available at NREL which relies on the SQL database called "Yuma". Below are instructures to modify the code
+to run in different environments.
+
+We are actively developing the `[graphenv](https://github.com/NREL/graph-env)` library 
+which is much more general purpose and enables scalability via the popular RLLib library. 
+We will soon update this README with a link to an updated version of this repo that uses `graphenv`.
+
+This library was first used for molecule optimization, hence the package name `rlmolecule`. 
+The molecule optimization code has been removed. Please see `[rlmolecule](https://github.com/NREL/rlmolecule)`
+if interested.
+
 
 ## Installation
 
@@ -23,7 +31,6 @@ channels:
 dependencies:
   - python=3.7
   - jupyterlab
-  - rdkit
   - seaborn
   - pandas
   - scikit-learn
@@ -41,6 +48,5 @@ dependencies:
 
 ## Usage
 
-This library is still under active development, and APIs are expected to change frequently. Currently, optimization
-proceeds by subclassing `alphazero.Node` to provide the expected reward function calculation. Example usage of the
-module is demonstrated for radical construction in `stable_radical_optimization/`.
+The code to optimize crystal structures for thermodynamic stability is in the folder `examples/crystal_stability`.
+Please see [examples/crystal_stability/README.md] for more details.
