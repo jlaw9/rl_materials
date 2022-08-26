@@ -3,7 +3,27 @@
 run_id: 'crystal_energy_example'
 
 # Parameters for setting up the problem
-#problem_config:
+problem_config:
+  # Specify states (nodes) in the action space to ignore.
+  # States can have a few types:
+    # 1. single element e.g., 'Li'
+    # 2. list of elements e.g., ['K', 'Br']
+    # 3. composition e.g., Li1Sc1F4
+    # 4. Graph 2 node e.g., _1_1_3 
+    # 5. prototype structure e.g., _1_1_3|monoclinic|icsd_094313
+  actions_to_ignore: [
+                       # we want at least 1 anion and 1 framework cation to try to get some more complex structures
+                       # so skip the compositions without any framework cations
+                       'K1Br1', 'K1Cl1', 'K1F1', 'K1I1', 'K2O1', 'K2S1', 'K3N1', 'K3P1', 
+                       'Li1Br1', 'Li1Cl1', 'Li1F1', 'Li1I1', 'Li2O1', 'Li2S1', 'Li3N1', 'Li3P1',
+                       'Na1Br1', 'Na1Cl1', 'Na1F1', 'Na1I1', 'Na2O1', 'Na2S1', 'Na3N1', 'Na3P1', 
+                       ]
+  # edgelist file with graph going from element combinations to compositions
+  action_graph1: "../../rlmolecule/crystal/inputs/eles_to_comps.edgelist.gz"
+  # edgelist file with graph going from composition types to decorations
+  action_graph2: "../../rlmolecule/crystal/inputs/comp_type_to_decors.edgelist.gz"
+  prototypes_file: "../../rlmolecule/crystal/inputs/prototypes.json.gz"
+
 
 # Parameters for training the policy model
 train_config:
@@ -11,10 +31,10 @@ train_config:
   # if the reward for a given game is > the previous
   # *ranked_reward_alpha* fraction of games (e.g., 75% of games),
   # then it's a win. Otherwise, it's a loss.
-  ranked_reward_alpha: 0.75
+  ranked_reward_alpha: 0.9
   # max/min number of games to consider
-  reward_buffer_max_size: 500
-  reward_buffer_min_size: 10
+  reward_buffer_max_size: 1000
+  reward_buffer_min_size: 50
 
   # Learning options:
   # some useful tips for selecting these parameter values:
@@ -57,7 +77,7 @@ mcts_config:
   # percentage to favor dirichlet noise vs. prior estimation. Smaller means less noise
   dirichlet_x: 0.25
   # number of samples to perform at each level of the MCTS search
-  num_mcts_samples: 50
+  num_mcts_samples: 250
   # the maximum search depth
   max_depth: 1000000
   #ucb_constant: math.sqrt(2)

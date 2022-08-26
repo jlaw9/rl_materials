@@ -14,18 +14,13 @@ if [ "$2" == "" ]; then
     exit
 fi
 
-CONDA_ENV="~/.conda-envs/crystals_nfp0_3"
-WORKING_DIR="/projects/rlmolecule/$USER/logs/crystal_energy/${run_id}"
+CONDA_ENV="rl_materials"
+#WORKING_DIR="/projects/rlmolecule/$USER/logs/crystal_energy/${run_id}"
+WORKING_DIR="outputs/${run_id}"
 mkdir -p $WORKING_DIR
 
-#ENERGY_MODEL="inputs/models/2022_05_04/battery_unrel_pred_vol/no_2xbound_randsub0_05_seed1/best_model.hdf5"
-#ENERGY_MODEL="inputs/models/2022_05_04/icsd_battrel_vol_pred_vol/randsub0_05_randsub0_05_holdout_match_seed1/best_model.hdf5"
-#ENERGY_MODEL="inputs/models/2022_06_07_pruned_outliers/icsd_and_battery_pred_vol/best_model.hdf5"
-# Use this option when the energy model was trained on structures with predicted volume
-# so that the input structures will also have their predicted volume applied
-#VOL_PRED="--vol-pred-site-bias /projects/rlmolecule/pstjohn/crystal_inputs/site_volumes_from_icsd.csv"
 # This model was trained on the normalized / scaled structures
-ENERGY_MODEL="inputs/models/2022_06_07_pruned_outliers/icsd_and_battery_scaled/best_model.hdf5"
+ENERGY_MODEL="inputs/models/best_model.hdf5"
 
 # copy the config file with the rest of the results
 SCRIPT_CONFIG="$WORKING_DIR/run.yaml"

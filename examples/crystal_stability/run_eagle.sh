@@ -14,14 +14,13 @@ if [ "$2" == "" ]; then
     exit
 fi
 
-WORKING_DIR="/projects/rlmolecule/$USER/logs/crystal_energy/${run_id}"
+CONDA_ENV="rl_materials"
+#WORKING_DIR="/projects/rlmolecule/$USER/logs/crystal_energy/${run_id}"
+WORKING_DIR="outputs/${run_id}"
 mkdir -p $WORKING_DIR
 
-#ENERGY_MODEL="inputs/models/2022_05_04/battery_unrel_pred_vol/no_2xbound_randsub0_05_seed1/best_model.hdf5"
-#ENERGY_MODEL="inputs/models/2022_05_04/icsd_battrel_vol_pred_vol/randsub0_05_randsub0_05_holdout_match_seed1/best_model.hdf5"
-#ENERGY_MODEL="inputs/models/2022_06_07_pruned_outliers/icsd_and_battery_pred_vol/best_model.hdf5"
 # This model was trained on the normalized / scaled structures
-ENERGY_MODEL="inputs/models/2022_06_07_pruned_outliers/icsd_and_battery_scaled/best_model.hdf5"
+ENERGY_MODEL="inputs/models/best_model.hdf5"
 # Use this option when the energy model was trained on structures with predicted volume
 # so that the input structures will also have their predicted volume applied
 #VOL_PRED="--vol-pred-site-bias /projects/rlmolecule/pstjohn/crystal_inputs/site_volumes_from_icsd.csv"
@@ -34,7 +33,7 @@ sed -i "s/crystal_energy_example/$run_id/" $SCRIPT_CONFIG
 
 echo """#!/bin/bash
 #SBATCH --account=rlmolecule
-#SBATCH --time=0:30:00  
+#SBATCH --time=4:00:00  
 #SBATCH --job-name=$run_id
 #SBATCH --mail-type=END
 #SBATCH --mail-user=$USER@nrel.gov
@@ -56,17 +55,17 @@ git log -n 1 --oneline
 
 export WORKING_DIR=$WORKING_DIR
 mkdir -p $WORKING_DIR
-export START_POLICY_SCRIPT="\$WORKING_DIR/\$JOB/.policy.sh"
-export START_ROLLOUT_SCRIPT="\$WORKING_DIR/\$JOB/.rollout.sh"
+export POLICY_SCRIPT="\$WORKING_DIR/\$JOB/.policy.sh"
+export ROLLOUT_SCRIPT="\$WORKING_DIR/\$JOB/.rollout.sh"
 # make sure the base folder of the repo is on the python path
 export PYTHONPATH="$(readlink -e ../../):\$PYTHONPATH"
 
-cat << EOF > "\$START_POLICY_SCRIPT"
+cat << EOF > "\$POLICY_SCRIPT"
 #!/bin/bash
 source $HOME/.bashrc_conda
 module use /nopt/nrel/apps/modules/test/modulefiles/
 module load cudnn/8.1.1/cuda-11.2
-conda activate ~/.conda-envs/crystals_nfp0_3
+conda activate $CONDA_ENV
 python -u optimize_crystal_energy_stability.py \
     --train-policy \
     --config $SCRIPT_CONFIG \
@@ -74,12 +73,12 @@ python -u optimize_crystal_energy_stability.py \
     $VOL_PRED
 EOF
 
-cat << EOF > "\$START_ROLLOUT_SCRIPT"
+cat << EOF > "\$ROLLOUT_SCRIPT"
 #!/bin/bash
 source $HOME/.bashrc_conda
 module use /nopt/nrel/apps/modules/test/modulefiles/
 module load cudnn/8.1.1/cuda-11.2
-conda activate ~/.conda-envs/crystals_nfp0_3
+conda activate $CONDA_ENV
 python -u optimize_crystal_energy_stability.py \
     --rollout \
     --config $SCRIPT_CONFIG \
@@ -88,20 +87,22 @@ python -u optimize_crystal_energy_stability.py \
 EOF
 
 
-chmod +x "\$START_POLICY_SCRIPT" "\$START_ROLLOUT_SCRIPT"
+chmod +x "\$POLICY_SCRIPT" "\$ROLLOUT_SCRIPT"
 
 srun --pack-group=0 \
      --job-name="az-policy" \
      --output=$WORKING_DIR/%j-gpu.out \
-     "\$START_POLICY_SCRIPT" &
+     "\$POLICY_SCRIPT" &
 
 # there are 36 cores on each eagle node.
+# I tried using all 36 cores, 
+# but for some reason the node would then only run a couple at a time 
 srun --pack-group=1 \
-     --ntasks-per-node=36 \
-     --cpus-per-task=1 \
+     --ntasks-per-node=17 \
+     --cpus-per-task=2 \
      --job-name="az-rollout" \
      --output=$WORKING_DIR/%j-mcts.out \
-     "\$START_ROLLOUT_SCRIPT"
+     "\$ROLLOUT_SCRIPT"
 """ > $WORKING_DIR/.submit.sh
 
 echo "sbatch $WORKING_DIR/.submit.sh"
