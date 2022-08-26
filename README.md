@@ -5,16 +5,21 @@
 A library for general-purpose material optimization using AlphaZero-style reinforcement learning.
 
 This repo is a snapshot of the code used for the paper "Upper-Bound Energy Minimization to Search for Stable
-Functional Materials with Graph Neural Networks" in 2022.  Much of this code is specific to the HPC system 
+Functional Materials with Graph Neural Networks" in 2022.  
+
+The code to optimize crystal structures for thermodynamic stability is in the folder `examples/crystal_stability`.
+Please see [this README](https://github.com/jlaw9/rlmolecule/tree/crystal_reward/examples/crystal_stability) for more details.
+
+Much of this code is specific to the HPC system 
 available at NREL which relies on the SQL database called "Yuma". Below are instructures to modify the code
 to run in different environments.
 
-We are actively developing the `[graphenv](https://github.com/NREL/graph-env)` library 
+We are actively developing the [graphenv](https://github.com/NREL/graph-env) library 
 which is much more general purpose and enables scalability via the popular RLLib library. 
 We will soon update this README with a link to an updated version of this repo that uses `graphenv`.
 
 This library was first used for molecule optimization, hence the package name `rlmolecule`. 
-The molecule optimization code has been removed. Please see `[rlmolecule](https://github.com/NREL/rlmolecule)`
+The molecule optimization code has been removed. Please see [rlmolecule](https://github.com/NREL/rlmolecule)
 if interested.
 
 
@@ -46,7 +51,3 @@ dependencies:
     - nfp >= 0.1.4
 ```
 
-## Usage
-
-The code to optimize crystal structures for thermodynamic stability is in the folder `examples/crystal_stability`.
-Please see [examples/crystal_stability/README.md] for more details.
