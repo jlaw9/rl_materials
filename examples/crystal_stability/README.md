@@ -1,6 +1,6 @@
 ## Prerequisites
 First, a model for predicting the total energy of a structure is required.
-Download the model used in the manuscript from here: https://github.com/jlaw9/upper-bound-energy-gnn/tree/main/pretrained_model 
+Download the model used in the manuscript from here: https://github.com/jlaw9/upper-bound-energy-gnn 
 and place it in the folder `inputs/models`
 
 A `yaml` config file specifies the prototypes, action graph, RL hyperparameters, and environment-specific variables 
